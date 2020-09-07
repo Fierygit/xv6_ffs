@@ -30,16 +30,12 @@ OBJS = \
 
 
 OBJSALL = \
-	bio.o\
 	console.o\
 	exec.o\
-	file.o\
-	ide.o\
 	ioapic.o\
 	kalloc.o\
 	kbd.o\
 	lapic.o\
-	log.o\
 	main.o\
 	mp.o\
 	picirq.o\
@@ -126,7 +122,7 @@ xv6.img: bootblock fs kernel
 	dd if=bootblock of=xv6.img conv=notrunc
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
 
-fs: fs/fs.o
+fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o
 	mv fs/*.o .
 
 xv6memfs.img: bootblock kernelmemfs
