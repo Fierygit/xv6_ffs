@@ -1,10 +1,10 @@
-#include "types.h"
-#include "defs.h"
-#include "param.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "fs.h"
-#include "buf.h"
+#include "../types.h"
+#include "../defs.h"
+#include "../param.h"
+#include "../spinlock.h"
+#include "../sleeplock.h"
+#include "../fs.h"
+#include "../buf.h"
 
 // Simple logging that allows concurrent FS system calls.
 //
