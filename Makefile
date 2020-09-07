@@ -196,10 +196,10 @@ mkfs: mkfs.c fs.h
 .PRECIOUS: %.o
 
 UPROGS=\
-	_cat\
-	_echo\
+	cmd/_cat\
+	cmd/_echo\
 	_forktest\
-	_grep\
+	cmd/_grep\
 	_init\
 	_kill\
 	_ln\
