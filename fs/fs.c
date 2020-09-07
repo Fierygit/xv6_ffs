@@ -17,7 +17,7 @@
 #include "../proc.h"
 #include "../spinlock.h"
 #include "../sleeplock.h"
-#include "fs.h"
+#include "../fs.h"
 #include "buf.h"
 #include "file.h"
 

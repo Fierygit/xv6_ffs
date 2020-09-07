@@ -10,7 +10,7 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
-#include "fs/fs.h"
+#include "fs.h"
 #include "fcntl.h"
 
 int

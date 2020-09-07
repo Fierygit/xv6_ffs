@@ -10,7 +10,7 @@
 #include "../traps.h"
 #include "../spinlock.h"
 #include "../sleeplock.h"
-#include "fs.h"
+#include "../fs.h"
 #include "buf.h"
 
 #define SECTOR_SIZE   512
