@@ -3,7 +3,6 @@ OBJS = \
 	console.o\
 	exec.o\
 	file.o\
-	fs.o\
 	ide.o\
 	ioapic.o\
 	kalloc.o\
@@ -28,6 +27,7 @@ OBJS = \
 	vectors.o\
 	vm.o\
 
+	# fs.o
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
 
