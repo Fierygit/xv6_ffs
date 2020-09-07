@@ -10,7 +10,7 @@
 #include "traps.h"
 #include "spinlock.h"
 #include "sleeplock.h"
-#include "fs.h"
+#include "fs/fs.h"
 #include "buf.h"
 
 extern uchar _binary_fs_img_start[], _binary_fs_img_size[];

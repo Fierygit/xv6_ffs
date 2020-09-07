@@ -10,10 +10,10 @@
 #include "stat.h"
 #include "mmu.h"
 #include "proc.h"
-#include "fs.h"
+#include "fs/fs.h"
 #include "spinlock.h"
 #include "sleeplock.h"
-#include "file.h"
+#include "fs/file.h"
 #include "fcntl.h"
 
 // Fetch the nth word-sized system call argument as a file descriptor

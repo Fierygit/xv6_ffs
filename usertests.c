@@ -2,7 +2,7 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
-#include "fs.h"
+#include "fs/fs.h"
 #include "fcntl.h"
 #include "syscall.h"
 #include "traps.h"
