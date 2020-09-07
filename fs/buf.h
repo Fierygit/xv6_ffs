@@ -1,6 +1,6 @@
 struct buf {
   int flags;
-  uint dev;
+  uint dev;       // File system’s disk device
   uint blockno;
   struct sleeplock lock;
   uint refcnt;

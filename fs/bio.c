@@ -24,11 +24,11 @@
 #include "../spinlock.h"
 #include "../sleeplock.h"
 #include "../fs.h"
-#include "../buf.h"
+#include "buf.h"
 
 struct {
   struct spinlock lock;
-  struct buf buf[NBUF];
+  struct buf buf[NBUF]; // 这里初始化的一个数组用双链表串起来，这样直接初始化了链表即缓存的大小
 
   // Linked list of all buffers, through prev/next.
   // head.next is most recently used.
