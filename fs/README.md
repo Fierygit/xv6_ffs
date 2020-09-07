@@ -40,7 +40,21 @@
 
 
 我们的实现思路， 尽可能将数据库放到同一个组中， 查找哪里的哪一个 group中的数据最多空闲， 因此将
-inode 存的 `addrs` 尽可能放到一个 group 中
+inode 存的 `addrs` 尽可能放到一个 group 中。
+
+```
+superblock sp;
+sb.size = xint(FSSIZE);
+sb.nblocks = xint(nblocks);
+sb.ninodes = xint(NINODES);
+sb.nlog = xint(nlog);
+sb.logstart = xint(2);
+sb.inodestart = xint(2+nlog);
+sb.bmapstart = xint(2+nlog+ninodeblocks);
+```
+已经提供磁盘一共有多少块的数据，直接在 superblock 中拿取，然后分组， 在分配 block 时，
+修改 `static uint balloc(uint dev)）`， 直接使用偏移量取， 根据偏移量来定位group，根据位图
+判断哪些还没有分配！
 
 
 大文件， 不实现
