@@ -8,7 +8,7 @@
 #include "../fs.h"
 #include "../spinlock.h"
 #include "../sleeplock.h"
-#include "file.h"
+#include "../file.h"
 
 struct devsw devsw[NDEV];
 struct {
