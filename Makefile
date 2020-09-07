@@ -96,7 +96,7 @@ xv6.img: bootblock fs kernel
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
 
 fs: fs/fs.o
-	mv fs/*.o ../
+	mv fs/*.o .
 
 xv6memfs.img: bootblock kernelmemfs
 	dd if=/dev/zero of=xv6memfs.img count=10000
