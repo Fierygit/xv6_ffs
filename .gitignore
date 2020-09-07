@@ -17,10 +17,13 @@ initcode.out
 kernel 
 xv6.img 
 fs.img 
-kernelmemfs 
+kernel
+memfs 
 xv6memfs.img 
-mkfs .gdbinit 
-_cat _echo 
+mkfs 
+.gdbinit 
+_cat 
+_echo 
 _forktest 
 _grep 
 _init 
