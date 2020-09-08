@@ -90,7 +90,7 @@ static int select_group(uint dev){
 }
 
 // 在某一个组分配
-static int balloc(uint dev, int group){
+static int balloc_by_group(uint dev, int group){
   int group_len,startb; 
   int i, b, bi, m;
   struct buf *bp;
@@ -117,14 +117,14 @@ static int balloc(uint dev, int group){
 static uint balloc_select(uint dev){
   uint ret, group;
   group = select_group(dev);
-  if((ret = balloc(dev, group)) != -1){
+  if((ret = balloc_by_group(dev, group)) != -1){
       return ret;
   }
   // 分配最少的block 都没有内存了， 报错
   panic("balloc: out of blocks");
 }
 
-static uint balloc(uint dev, uint *addr, uint bn){
+static uint balloc_ffs(uint dev, uint *addr, uint bn){
   int group, ret;
 
   group = 0;
@@ -134,8 +134,8 @@ static uint balloc(uint dev, uint *addr, uint bn){
     return balloc_select(dev);
   }
   // 默认选择上一次分配的组进行分配
-  group = addr[bn] / GSIZE;
-  if((ret = balloc(dev, group)) != -1){
+  group = addr[bn - 1] / GSIZE;
+  if((ret = balloc_by_group(dev, group)) != -1){
       return ret;
   }
   return balloc_select(dev);
