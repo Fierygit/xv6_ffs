@@ -123,7 +123,7 @@ locks: locks/sleeplock.o locks/spinlock.o
 	mv locks/*.o .
 
 process: processes/swtch.o processes/kalloc.o processes/vm.o processes/proc.o
-	mv locks/*.o .
+	mv processes/*.o .
 
 mvfile = cat.c echo.c forktest.c grep.c kill.c  ln.c ls.c  \
 mkdir.c rm.c sh.c stressfs.c usertests.c wc.c zombie.c
