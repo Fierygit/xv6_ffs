@@ -16,7 +16,7 @@ main.c
 
 # locks
 spinlock.h
-spinlock.c
+locks/spinlock.c
 
 # processes
 vm.c
@@ -35,19 +35,19 @@ syscall.c
 sysproc.c
 
 # file system
-buf.h
+fs/buf.h
 sleeplock.h
 fcntl.h
 stat.h
 fs.h
 file.h
-ide.c
-bio.c
-sleeplock.c
-log.c
-fs.c
-file.c
-sysfile.c
+fs/ide.c
+fs/bio.c
+locks/sleeplock.c
+fs/log.c
+fs/fs.c
+fs/file.c
+fs/sysfile.c
 exec.c
 
 # pipes
