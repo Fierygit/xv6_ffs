@@ -114,7 +114,7 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
-xv6.img: bootblock fs locks kernel
+xv6.img: mvfile bootblock fs locks kernel
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
@@ -124,6 +124,13 @@ fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o fs/sysfile.o
 
 locks: locks/sleeplock.o locks/spinlock.o
 	mv locks/*.o .
+
+mvfile = cat.c echo.c forktest.c grep.c kill.c  ln.c ls.c  \
+mkdir.c rm.c sh.c stressfs.c usertests.c wc.c zombie.c
+
+mvfile:
+	echo start to mv
+	mv cmd/$(mvfile) .
 
 
 xv6memfs.img: bootblock kernelmemfs
