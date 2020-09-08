@@ -19,11 +19,11 @@ spinlock.h
 locks/spinlock.c
 
 # processes
-vm.c
+processes/vm.c
 proc.h
-proc.c
-swtch.S
-kalloc.c
+processes/proc.c
+processes/swtch.S
+processes/kalloc.c
 
 # system calls
 traps.h

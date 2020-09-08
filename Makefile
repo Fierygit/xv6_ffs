@@ -33,23 +33,20 @@ OBJSALL = \
 	console.o\
 	exec.o\
 	ioapic.o\
-	kalloc.o\
 	kbd.o\
 	lapic.o\
 	main.o\
 	mp.o\
 	picirq.o\
 	pipe.o\
-	proc.o\
 	string.o\
-	swtch.o\
 	syscall.o\
 	sysproc.o\
 	trapasm.o\
 	trap.o\
 	uart.o\
 	vectors.o\
-	vm.o\
+
 
 	# fs.o
 # Cross-compiling (e.g., on Mac OS X)
@@ -114,7 +111,7 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
-xv6.img: mvfile bootblock fs locks kernel 
+xv6.img: mvfile bootblock fs locks process kernel 
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
@@ -123,6 +120,9 @@ fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o fs/sysfile.o
 	mv fs/*.o .
 
 locks: locks/sleeplock.o locks/spinlock.o
+	mv locks/*.o .
+
+process: processes/swtch.o processes/kalloc.o processes/vm.o processes/proc.o
 	mv locks/*.o .
 
 mvfile = cat.c echo.c forktest.c grep.c kill.c  ln.c ls.c  \
