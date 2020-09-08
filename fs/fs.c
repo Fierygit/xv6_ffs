@@ -54,6 +54,7 @@ static void bzero(int dev, int bno) {
 static uint balloc(uint dev) {
   int b, bi, m;
   struct buf *bp;
+  struct buf *sbp;
 
   bp = 0;
   for (b = 0; b < sb.size; b += BPB) {
@@ -65,6 +66,10 @@ static uint balloc(uint dev) {
         log_write(bp);
         brelse(bp);
         bzero(dev, b + bi);
+        sbp = bread(dev, 1);
+        // 这里记录一下
+        sbp->data[sizeof(bp->data) -  (b+bi)/ GSIZE - 1]++;
+        brelse(sbp);
         return b + bi;
       }
     }
@@ -73,11 +78,12 @@ static uint balloc(uint dev) {
   panic("balloc: out of blocks");
 }
 
+// **************************************************************
+// simple ffs
 // 找出分配最少的组进行分配
-static int select_group(uint dev){
+static int select_group(uint dev, struct buf * bp){
   int i, select_group, min_tmp;
-  struct buf *bp;
-  bp = bread(dev, 1); // 读取出头
+
   for(i = 0; i < GSIZE; i++){
       //找出最多未分配的组， 也就是找出最少分配了的组
     if(bp->data[sizeof(bp->data) - i - 1] < min_tmp){
@@ -92,7 +98,7 @@ static int select_group(uint dev){
 // 在某一个组分配
 static int balloc_by_group(uint dev, int group){
   int group_len,startb; 
-  int i, b, bi, m;
+  int b, bi, m;
   struct buf *bp;
 
   group_len = (sb.size / GSIZE);
@@ -114,9 +120,9 @@ static int balloc_by_group(uint dev, int group){
   return -1;
 }
 
-static uint balloc_select(uint dev){
+static uint balloc_select(uint dev, struct buf *bp){
   uint ret, group;
-  group = select_group(dev);
+  group = select_group(dev,bp);
   if((ret = balloc_by_group(dev, group)) != -1){
       return ret;
   }
@@ -126,20 +132,27 @@ static uint balloc_select(uint dev){
 
 static uint balloc_ffs(uint dev, uint *addr, uint bn){
   int group, ret;
+  struct buf *bp;
 
+  bp = bread(dev, 1); // 读取出头
   group = 0;
   // 第一次分配，选择最多空闲的组分配分配
   // 作用： 当分配不足时，可以减少换区 
   if(!bn){
-    return balloc_select(dev);
+    ret = balloc_select(dev,bp);
   }
   // 默认选择上一次分配的组进行分配
-  group = addr[bn - 1] / GSIZE;
-  if((ret = balloc_by_group(dev, group)) != -1){
-      return ret;
+  else {
+    group = addr[bn - 1] / GSIZE;
+    if((ret = balloc_by_group(dev, group)) == -1){
+      ret = balloc_select(dev,bp);
+    }
   }
-  return balloc_select(dev);
+  bp->data[sizeof(bp->data) - group - 1]++;
+  brelse(bp);
+  return ret;
 }
+
 
 // Free a disk block.
 static void bfree(int dev, uint b) {
@@ -152,6 +165,10 @@ static void bfree(int dev, uint b) {
   if ((bp->data[bi / 8] & m) == 0) panic("freeing free block");
   bp->data[bi / 8] &= ~m;
   log_write(bp);
+  brelse(bp);
+  // 这里释放了，标记一下释放了
+  bp = bp = bread(dev, 1); // 读取出头
+  bp->data[sizeof(bp->data) -  b / GSIZE - 1]--;
   brelse(bp);
 }
 
@@ -414,7 +431,7 @@ static uint bmap(struct inode *ip, uint bn) {
   struct buf *bp;
 
   if (bn < NDIRECT) {
-    if ((addr = ip->addrs[bn]) == 0) ip->addrs[bn] = addr = balloc(ip->dev);
+    if ((addr = ip->addrs[bn]) == 0) ip->addrs[bn] = addr = balloc_ffs(ip->dev, ip->addrs, bn); 
     return addr;
   }
   bn -= NDIRECT;
@@ -422,11 +439,11 @@ static uint bmap(struct inode *ip, uint bn) {
   if (bn < NINDIRECT) {
     // Load indirect block, allocating if necessary.
     if ((addr = ip->addrs[NDIRECT]) == 0)
-      ip->addrs[NDIRECT] = addr = balloc(ip->dev);
+      ip->addrs[NDIRECT] = addr = balloc_ffs(ip->dev, ip->addrs, bn);
     bp = bread(ip->dev, addr);
     a = (uint *)bp->data;
     if ((addr = a[bn]) == 0) {
-      a[bn] = addr = balloc(ip->dev);
+      a[bn] = addr = balloc_ffs(ip->dev, ip->addrs, bn);
       log_write(bp);
     }
     brelse(bp);
