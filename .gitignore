@@ -20,8 +20,7 @@ fs.img
 kernel
 memfs 
 xv6memfs.img 
-mkfs 
-.gdbinit 
+mkfs
 _cat 
 _echo 
 _forktest 
