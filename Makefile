@@ -46,7 +46,6 @@ OBJSALL = \
 	string.o\
 	swtch.o\
 	syscall.o\
-	sysfile.o\
 	sysproc.o\
 	trapasm.o\
 	trap.o\
@@ -122,7 +121,7 @@ xv6.img: bootblock fs kernel
 	dd if=bootblock of=xv6.img conv=notrunc
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
 
-fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o
+fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o sysfile.o
 	mv fs/*.o .
 
 xv6memfs.img: bootblock kernelmemfs
