@@ -128,9 +128,10 @@ locks: locks/sleeplock.o locks/spinlock.o
 mvfile = cat.c echo.c forktest.c grep.c kill.c  ln.c ls.c  \
 mkdir.c rm.c sh.c stressfs.c usertests.c wc.c zombie.c
 
+
 mvfile:
 	echo start to mv
-	mv cmd/$(mvfile) .
+	mv $(addprefix cmd/, $(mvfile)) .
 
 
 xv6memfs.img: bootblock kernelmemfs
