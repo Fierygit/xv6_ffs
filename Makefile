@@ -131,13 +131,13 @@ mkdir.c rm.c sh.c stressfs.c usertests.c wc.c zombie.c
 
 mvfile:
 	echo start to mv
-	mv $(addprefix cmd/, $(mvfile)) .
+	-mv $(addprefix cmd/, $(mvfile)) .
 
 mvcmd:
-	mv $(mvfile) cmd/
+	-mv $(mvfile) cmd/
 
 push:
-	mv $(mvfile) cmd/
+	-mv $(mvfile) cmd/
 	git add .
 	git commit 
 	git push
