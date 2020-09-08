@@ -41,8 +41,6 @@ OBJSALL = \
 	picirq.o\
 	pipe.o\
 	proc.o\
-	sleeplock.o\
-	spinlock.o\
 	string.o\
 	swtch.o\
 	syscall.o\
@@ -116,13 +114,17 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
-xv6.img: bootblock fs kernel
+xv6.img: bootblock fs locks kernel
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
 
-fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o sysfile.o
+fs: fs/fs.o fs/file.o fs/log.o fs/bio.o fs/ide.o fs/sysfile.o
 	mv fs/*.o .
+
+locks: locks/sleeplock.o locks/spinlock.o
+	mv locks/*.o .
+
 
 xv6memfs.img: bootblock kernelmemfs
 	dd if=/dev/zero of=xv6memfs.img count=10000
