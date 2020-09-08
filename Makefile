@@ -114,7 +114,7 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
-xv6.img: mvfile bootblock fs locks kernel
+xv6.img: mvfile bootblock fs locks kernel 
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
 	dd if=kernel of=xv6.img seek=1 conv=notrunc
@@ -133,6 +133,14 @@ mvfile:
 	echo start to mv
 	mv $(addprefix cmd/, $(mvfile)) .
 
+mvcmd:
+	mv $(mvfile) cmd/
+
+push:
+	mv $(mvfile) cmd/
+	git add .
+	git commit 
+	git push
 
 xv6memfs.img: bootblock kernelmemfs
 	dd if=/dev/zero of=xv6memfs.img count=10000
@@ -232,6 +240,8 @@ clean:
 	initcode initcode.out kernel xv6.img fs.img kernelmemfs \
 	xv6memfs.img mkfs .gdbinit \
 	$(UPROGS)
+
+	mv $(mvfile) ./cmd/
 
 # make a printout
 FILES = $(shell grep -v '^\#' runoff.list)
