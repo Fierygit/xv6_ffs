@@ -84,7 +84,9 @@ static uint balloc(uint dev) {
 static int select_group(uint dev, struct buf * bp){
   int i, select_group, min_tmp;
 
-  for(i = 0; i < GSIZE; i++){
+  min_tmp = bp->data[sizeof(bp->data) - 1];
+
+  for(i = 1; i < GSIZE; i++){
       //找出最多未分配的组， 也就是找出最少分配了的组
     if(bp->data[sizeof(bp->data) - i - 1] < min_tmp){
       select_group = i;
@@ -167,7 +169,7 @@ static void bfree(int dev, uint b) {
   log_write(bp);
   brelse(bp);
   // 这里释放了，标记一下释放了
-  bp = bp = bread(dev, 1); // 读取出头
+  bp = bread(dev, 1); // 读取出头
   bp->data[sizeof(bp->data) -  b / GSIZE - 1]--;
   brelse(bp);
 }
