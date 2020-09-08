@@ -5,6 +5,7 @@
 #define ROOTINO 1  // root i-number
 #define BSIZE 512  // block size
 
+#define GSIZE 4
 // Disk layout:
 // [ boot block | super block | log | inode blocks |
 //                                          free bit map | data blocks]

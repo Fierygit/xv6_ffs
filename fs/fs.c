@@ -22,6 +22,8 @@
 #include "../file.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
+
 static void itrunc(struct inode *);
 // there should be one superblock per disk device, but we run with
 // only one device
@@ -57,7 +59,7 @@ static uint balloc(uint dev) {
   for (b = 0; b < sb.size; b += BPB) {
     bp = bread(dev, BBLOCK(b, sb));
     for (bi = 0; bi < BPB && b + bi < sb.size; bi++) {
-      m = 1 << (bi % 8);
+      m = 1 << (bi % 8); // 取出标志位
       if ((bp->data[bi / 8] & m) == 0) {  // Is block free?
         bp->data[bi / 8] |= m;            // Mark block in use.
         log_write(bp);
@@ -69,6 +71,74 @@ static uint balloc(uint dev) {
     brelse(bp);
   }
   panic("balloc: out of blocks");
+}
+
+// 找出分配最少的组进行分配
+static int select_group(uint dev){
+  int i, select_group, min_tmp;
+  struct buf *bp;
+  bp = bread(dev, 1); // 读取出头
+  for(i = 0; i < GSIZE; i++){
+      //找出最多未分配的组， 也就是找出最少分配了的组
+    if(bp->data[sizeof(bp->data) - i - 1] < min_tmp){
+      select_group = i;
+      min_tmp = bp->data[sizeof(bp->data) - i - 1];
+    }
+  }
+  brelse(bp);
+  return select_group;
+}
+
+// 在某一个组分配
+static int balloc(uint dev, int group){
+  int group_len,startb; 
+  int i, b, bi, m;
+  struct buf *bp;
+
+  group_len = (sb.size / GSIZE);
+  startb = group * group_len;
+  // 尝试在这个组分配
+  for (b = startb;  b < startb + group_len; b += BPB) {
+    bp = bread(dev, BBLOCK(b, sb));
+    for (bi = 0; bi < BPB && b + bi < sb.size; bi++) {
+      m = 1 << (bi % 8); // 取出标志位
+      if ((bp->data[bi / 8] & m) == 0) {  
+        bp->data[bi / 8] |= m;            
+        log_write(bp);
+        brelse(bp);
+        bzero(dev, b + bi);
+        return b + bi;
+      }
+    }
+  }
+  return -1;
+}
+
+static uint balloc_select(uint dev){
+  uint ret, group;
+  group = select_group(dev);
+  if((ret = balloc(dev, group)) != -1){
+      return ret;
+  }
+  // 分配最少的block 都没有内存了， 报错
+  panic("balloc: out of blocks");
+}
+
+static uint balloc(uint dev, uint *addr, uint bn){
+  int group, ret;
+
+  group = 0;
+  // 第一次分配，选择最多空闲的组分配分配
+  // 作用： 当分配不足时，可以减少换区 
+  if(!bn){
+    return balloc_select(dev);
+  }
+  // 默认选择上一次分配的组进行分配
+  group = addr[bn] / GSIZE;
+  if((ret = balloc(dev, group)) != -1){
+      return ret;
+  }
+  return balloc_select(dev);
 }
 
 // Free a disk block.
@@ -366,6 +436,8 @@ static uint bmap(struct inode *ip, uint bn) {
   panic("bmap: out of range");
 }
 
+
+
 // Truncate inode (discard contents).
 // Only called when the inode has no links
 // to it (no directory entries referring to it)
@@ -423,6 +495,7 @@ int readi(struct inode *ip, char *dst, uint off, uint n) {
   if (off > ip->size || off + n < off) return -1;
   if (off + n > ip->size) n = ip->size - off;
 
+// 对超出的部分进行分配
   for (tot = 0; tot < n; tot += m, off += m, dst += m) {
     bp = bread(ip->dev, bmap(ip, off / BSIZE));
     m = min(n - tot, BSIZE - off % BSIZE);

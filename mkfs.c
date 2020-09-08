@@ -112,7 +112,11 @@ main(int argc, char *argv[])
 
   memset(buf, 0, sizeof(buf));
   memmove(buf, &sb, sizeof(sb));
-  wsect(1, buf);
+
+  // 用superblock 的后4位作为每一个组的统计数量
+  memset(buf + sizeof(buf) - GSIZE,0,GSIZE);
+
+  wsect(1, buf);// 把 buf 写入第一个块中
 
   rootino = ialloc(T_DIR);
   assert(rootino == ROOTINO);
