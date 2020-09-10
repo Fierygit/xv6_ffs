@@ -433,7 +433,8 @@ static uint bmap(struct inode *ip, uint bn) {
   struct buf *bp;
 
   if (bn < NDIRECT) {
-    if ((addr = ip->addrs[bn]) == 0) ip->addrs[bn] = addr = balloc_ffs(ip->dev, ip->addrs, bn); 
+    if ((addr = ip->addrs[bn]) == 0)
+      ip->addrs[bn] = addr = balloc_ffs(ip->dev, ip->addrs, bn);
     return addr;
   }
   bn -= NDIRECT;
@@ -454,8 +455,6 @@ static uint bmap(struct inode *ip, uint bn) {
 
   panic("bmap: out of range");
 }
-
-
 
 // Truncate inode (discard contents).
 // Only called when the inode has no links
